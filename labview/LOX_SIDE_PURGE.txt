@@ -1,0 +1,59 @@
+# WELCOME TO THE AUTO SEQUENCE COMMANDS FILE.
+# Command Format:
+#   (NOTE: Read about specific commands in "COMMANDS_README.txt")
+#   (NOTE: CAPITALIZATION MATTERS!)
+#   For commands with no arguments (rare): <command>
+#   For commands with arguments: <command> >> <argument>
+#   For multi-argument comands: <command> >> <argument1>,<argument2>,...,<argument3>
+# Comments:
+#   On any line, all text after "#" or "//" is considered a comment like in normal programming and is thrown out by the command parser.
+#   If you don't want a command to run, simply put a "#" at the start of the line.
+# Procedures:
+#   Any given test (cold flow, hot fire) will need modifications to some arguments in this file.
+#   If you don't remember which command arguments to modify, in this file press Ctrl+f and search for "//!".
+#   These should be inline comments that point out arguments that are often changed per test.
+#   It will tell you you what the argument means.
+### PRE-PROCEDURES ###
+# Check that the ESTOP is not hit
+ARMED >> On
+# Start data logger and confirm status
+LOG_TRIG_ON >> On
+LOG_TRIG_STATUS >> On
+Status >> Logger is now on
+# Detect that all actuators are plugged in (NOTE: we cannot check any valves that are being powered, such as DET_PRESS_FU or both vents)
+DET_PURGE_FU >> On
+DET_PURGE_OX >> On
+# Set all actuators to the initial states for the sequence
+ACT_EMATCH >> Off
+ACT_SIREN >> Off
+Winch >> Off
+ACT_PRESS_FU >> Close
+ACT_PRESS_OX >> Close //! Set this to "Close" only when used in conjuction with "Wait for OX Tank Pressure" command later on. Otherwise "Open".
+ACT_MAIN_FU >> Close
+ACT_MAIN_OX >> Close
+ACT_FILL_FU >> CLose
+ACT_FILL_OX >> Close
+ACTI_VENT_FU >> Close
+ACTI_VENT_OX >> Close
+ACT_PURGE_FU >> Close
+ACT_PURGE_OX >> Close
+ACT_MBV >> Close
+Status >> Waiting for all valves
+FBK_PRESS_FU >> Close
+FBK_PRESS_OX >> Close //! Set this to "Close" only when used in conjuction with "Wait for OX Tank Pressure" command later on. Otherwise "Open"
+FBK_MAIN_FU >> Close
+FBK_MAIN_OX >> Close
+FBK_FILL_FU >> Close
+FBK_FILL_OX >> Close
+FBK_VENT_FU >> Close
+FBK_VENT_OX >> Close
+FBK_PURGE_FU >> Close
+FBK_PURGE_OX >> Close
+FBK_MBV >> Close //! If this channel is non-functional, replace it with "Wait >> 12"
+ACT_PURGE_OX >> Open
+FBK_PURGE_OX >> Open
+Wait >> 5
+ACT_PURGE_OX >> Close
+FBK_PURGE_OX >> Close
+Wait >> 200
+LOG_TRIG_ON >> Off

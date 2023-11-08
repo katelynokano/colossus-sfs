@@ -1,0 +1,152 @@
+# WELCOME TO THE AUTO SEQUENCE COMMANDS FILE.
+# Command Format:
+#   (NOTE: Read about specific commands in "COMMANDS_README.txt")
+#   (NOTE: CAPITALIZATION MATTERS!)
+#   For commands with no arguments (rare): <command>
+#   For commands with arguments: <command> >> <argument>
+#   For multi-argument comands: <command> >> <argument1>,<argument2>,...,<argument3>
+# Comments:
+#   On any line, all text after "#" or "//" is considered a comment like in normal programming and is thrown out by the command parser.
+#   If you don't want a command to run, simply put a "#" at the start of the line.
+# Procedures:
+#   Any given test (cold flow, hot fire) will need modifications to some arguments in this file.
+#   If you don't remember which command arguments to modify, in this file press Ctrl+f and search for "//!".
+#   These should be inline comments that point out arguments that are often changed per test.
+#   It will tell you you what the argument means.
+### PRE-PROCEDURES ###
+# Check that the ESTOP is not hit
+ARMED >> On
+# Start data logger and confirm status
+LOG_TRIG_ON >> On
+LOG_TRIG_STATUS >> On
+Status >> Logger is now on
+# Detect that all actuators are plugged in (NOTE: we cannot check any valves that are being powered, such as DET_PRESS_FU or both vents)
+DET_EMATCH >> On
+DET_PRESS_OX >> On
+DET_MAIN_FU >> On
+DET_MAIN_OX >> On
+DET_FILL_FU >> On
+DET_FILL_OX >> On
+DET_PURGE_FU >> On
+DET_PURGE_OX >> On
+# Set all actuators to the initial states for the sequence
+ACT_EMATCH >> Off
+ACT_SIREN >> Off
+Winch >> Off
+ACT_PRESS_FU >> Open
+ACT_PRESS_OX >> Close //! Set this to "Close" only when used in conjuction with "Wait for OX Tank Pressure" command later on. Otherwise "Open".
+ACT_MAIN_FU >> Close
+ACT_MAIN_OX >> Close
+ACT_FILL_FU >> CLose
+ACT_FILL_OX >> Close
+ACTI_VENT_FU >> Close
+ACTI_VENT_OX >> Close
+ACT_PURGE_FU >> Close
+ACT_PURGE_OX >> Close
+ACT_MBV >> Open
+# Run load cell calibration
+Status >> Running load cell calibration
+Winch >> Pull,250
+Wait >> 1.5
+Winch >> Release,200
+Wait >> 1.5
+Winch >> Release,150
+Wait >> 1.5
+Winch >> Release,100
+Wait >> 1.5
+Winch >> Release,0
+Status >> Load cell calibration complete.
+# Check that initial states were actually reached
+Status >> Waiting for all valves
+FBK_PRESS_FU >> Open
+FBK_PRESS_OX >> Close //! Set this to "Close" only when used in conjuction with "Wait for OX Tank Pressure" command later on. Otherwise "Open"
+FBK_MAIN_FU >> Close
+FBK_MAIN_OX >> Close
+FBK_FILL_FU >> Close
+FBK_FILL_OX >> Close
+FBK_VENT_FU >> Close
+FBK_VENT_OX >> Close
+FBK_PURGE_FU >> Close
+FBK_PURGE_OX >> Close
+FBK_MBV >> Open //! If this channel is non-functional, replace it with "Wait >> 12"
+# This step pauses sequence and waits for user to press OK in the pop-up window
+User OK Dialog >> Let USC Start Water Hose, then press OK to proceed with auto sequence //! can be commented out if not needed
+### PROCEDURES ###
+# Automated OX Tank pressurization.
+#   This batch of commands will begin pressurization of the OX tank
+#   and read the pressure sensor until it reaches the argument value PSI,
+#   and only then will move on to the next command.
+#   You can comment out these lines if you want to do manual pressurization, but ensure that you modify "..._PRESS_OX >> Close" commands above to be "Open".
+Status >> Waiting for OX Tank Pressurization
+ACT_PRESS_OX >> Open
+FBK_PRESS_OX >> Open
+Wait for OX Tank Pressure >> 675 //! THE PRESSURE (PSI) THAT THE OX TANK SHOULD REACH
+# Countdown procedures
+ACT_SIREN >> On
+Start Countdown >> 5 //! NUMBER OF SECONDS TO COUNT DOWN FROM (should equal all "Wait >> #" and "Abort Condition >> #,..." from here until "ACT_MAIN >> Open")
+Status >> Starting countdown
+Wait >> 3 //! extra delay to compensate for 5 second countdown
+ACT_EMATCH >> On
+ACT_SIREN >> Off
+Wait >> 0.5 //! NUMBER OF SECONDS BETWEEN TURNING ON IGNITION AND OPENING MAIN VALVES
+ACT_EMATCH >> Off
+Wait >> 1.5
+ACT_MAIN_OX >> Open
+Wait >> 0.5 //! NUMBER OF SECONDS BETWEEN OPENING OX MAIN VALVE AND FU MAIN VALVE
+ACT_MAIN_FU >> Open // T-0
+FBK_MAIN_OX >> Open
+FBK_MAIN_FU >> Open
+### FIRE #########################################################################
+# The total fire time is equal to all "Wait >> #" and "Abort Condition >> #,..." from here until "ACT_MAIN >> Close"
+Status >> Firing
+Wait >> 2.7 //(counts towards total burn time)
+DO_ENGINE_1 >> On // Slow motion camera, records the past 4 seconds
+Wait >> 24.3 //! TO OPEN THE PURGES (counts towards total burn time)
+ACT_PURGE_FU >> Open
+ACT_PURGE_OX >> Open
+Wait >> 3 //! AFTER PURGES OPEN TO CONTINUE THE BURN (counts towards total burn time)
+### GRACEFUL END ##################################################################
+Status >> Firing completed. Resetting valves...
+ACT_MAIN_OX >> Close
+Wait >> 1
+ACT_MAIN_FU >> Close
+DO_ENGINE_1 >> Off // Reset slow motion camera
+FBK_MAIN_OX >> Close
+FBK_MAIN_FU >> Close
+ACTI_VENT_FU >> Open
+ACTI_VENT_OX >> Open
+ACT_PRESS_FU >> Close
+ACT_PRESS_OX >> Close
+ACT_MBV >> Close
+Status >> Continuing to purge...
+Wait >> 4 //! NUMBER OF SECONDS TO KEEP PURGES OPEN AFTER MAIN VALVES CLOSED
+//ACT_PURGE_FU >> Close
+//ACT_PURGE_OX >> Close
+FBK_MBV >> Close //! If this channel is non-functional, replace it with "Wait >> 12"
+Status >> Releasing the pressure between MBV and PRESS
+ACT_PRESS_FU >> Open
+ACT_PRESS_OX >> Open
+Wait >> 2
+ACT_PRESS_FU >> Close
+ACT_PRESS_OX >> Close
+FBK_PRESS_FU >> Close
+FBK_PRESS_OX >> Close
+ACT_MBV >> Open
+### FINISH ###
+# Run load cell calibration
+Status >> Running load cell calibration
+Winch >> Pull,250
+Wait >> 1.5
+Winch >> Release,200
+Wait >> 1.5
+Winch >> Release,150
+Wait >> 1.5
+Winch >> Release,100
+Wait >> 1.5
+Winch >> Release,0
+Status >> Load cell calibration complete.
+LOG_TRIG_ON >> Off
+Status >> Logger is now turned off. Expect a logfile in a few seconds. Waiting for safety...
+Wait >> 10
+FBK_MBV >> Open //! If this channel is non-functional, replace it with "Wait >> 12"
+Status >> Reached end of commands file

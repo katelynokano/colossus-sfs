@@ -1,0 +1,43 @@
+2:38:46 PM Data: Cleanup
+2:38:46 PM Macro: Exit
+2:38:45 PM Idle
+2:38:45 PM UI: Change Tabs >> 0
+2:38:45 PM UI: All Tabs >> Enable
+2:38:45 PM UI: Proceed Button >> Disable
+2:38:45 PM UI: Pause Button >> Disable
+2:38:45 PM UI: Return Button >> Disable
+2:38:44 PM ACT_SIREN >> Off
+2:38:44 PM ACT_EMATCH >> Off
+2:38:44 PM STATUS >> Standby
+2:38:44 PM ENTRY: Standby
+2:38:36 PM UI: Change Tabs >> 1
+2:38:35 PM UI: One Tab Enable >> 1
+2:38:35 PM UI: All Tabs >> Disable
+2:38:35 PM UI: Pause Button >> Disable
+2:38:35 PM UI: Return Button >> Enable
+2:38:35 PM UI: Proceed Button >> Disable
+2:38:35 PM ACT_SIREN >> Off
+2:38:35 PM ACT_EMATCH >> Off
+2:38:35 PM STATUS >> You can now actuate
+2:38:34 PM ENTRY: Control Panel
+2:38:29 PM 
+2:38:29 PM UI: Proceed Button >> Disable
+2:38:29 PM Macro: INIT SubVIs >> Demo
+2:38:29 PM Idle
+2:38:29 PM UI: Change Tabs >> 0
+2:38:28 PM UI: All Tabs >> Enable
+2:38:28 PM UI: Proceed Button >> Disable
+2:38:28 PM UI: Pause Button >> Disable
+2:38:28 PM UI: Return Button >> Disable
+2:38:28 PM ACT_SIREN >> Off
+2:38:28 PM ACT_EMATCH >> Off
+2:38:28 PM STATUS >> Standby
+2:38:28 PM ENTRY: Standby
+2:38:27 PM UI: All Tabs >> Disable
+2:38:27 PM UI: Initialize
+2:38:27 PM UI: Proceed Button >> Disable
+2:38:17 PM Macro: INIT SubVIs >> Online
+2:38:17 PM UI: Front Panel State >> Open
+2:38:17 PM Initialize Core Data
+2:38:17 PM Data: Initialize
+2:38:17 PM Macro: Initialize
